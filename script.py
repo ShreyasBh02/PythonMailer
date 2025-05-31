@@ -4,17 +4,28 @@ from email.mime.multipart import MIMEMultipart
 import os 
 
 
-def send_mail(Workflow_name, repo_name,Workflow_id):
+
+def send_mail(workflow_name, repo_name, workflow_id):
     sender_email = os.getenv('SENDER_EMAIL')
     sender_password = os.getenv('SENDER_PASSWORD')
     receiver_email = os.getenv("RECEIVER_EMAIL")
 
+    
+    if not all([sender_email, sender_password, receiver_email]):
+        print("Missing email credentials or recipient address.")
+        return
+
     ##Email Message
-    subject = f"Workflow {Workflow_name} failed for the repo {repo_name}"
-    body = f"Hi, \nthe workflow {Workflow_name} failed for the repo {repo_name}. please check the logs for more details. \nMoreDetails: \nRun_ID:{Workflow_id}"
+    subject = f"Workflow {workflow_name} failed for the repo {repo_name}"
+    body = (
+        f"Hi,\n\n"
+        f"The workflow '{workflow_name}' failed for the repo '{repo_name}'. Please check the logs for more details.\n"
+        f"More Details:\nRun ID: {workflow_id}"
+    )
+
 
     msg = MIMEMultipart()
-    msg['From'] = send_mail
+    msg['From'] = sender_email
     msg['To']   = receiver_email
     msg['Subject'] = subject
     msg.attach(MIMEText(body, 'plain'))
